@@ -14,11 +14,13 @@ namespace HandFootLib.Services.Interfaces
 
         public void DeletePlayer(int id);
 
-        public IQueryable<PlayerGetDTO> GetPlayer(int id);
+        public PlayerGetBasicDTO? GetPlayer(int id);
 
-        public IQueryable<PlayerGetDTO> GetPlayers();
+        public IQueryable<PlayerGetBasicDTO> GetPlayers();
 
-        //public List<PlayerGetDTO> GetPlayersForTeam(int teamId);
+        //public void AddFriend(int playerId, int friendId);
+
+        //public void RemoveFriend(int playerId, int friendId);
 
         public void UpdatePlayer(Player player);
     }

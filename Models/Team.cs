@@ -14,7 +14,7 @@ namespace HandFootLib.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        [StringLength(50)] // Set the maximum length to 50 characters
+        [StringLength(50)]
         public string? Name { get; set; }
         public List<Player> Players { get; set; } = new List<Player>();
         public List<GameTeam> Games { get; set; } = new List<GameTeam>();

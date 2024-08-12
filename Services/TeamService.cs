@@ -6,7 +6,7 @@ namespace HandFootLib.Services
 {
     public class TeamService : ITeamService
     {
-        private readonly Data _data = new();
+        private readonly Data _data;
 
         public TeamService(Data data) { _data = data; }
 
@@ -60,7 +60,6 @@ namespace HandFootLib.Services
                                Name = t.Name,
                                PlayerId = p.Id,
                                PlayerNickName = p.NickName
-
                            };
 
             return allTeams;

@@ -6,13 +6,12 @@ using System.Threading.Tasks;
 
 namespace HandFootLib.Models.DTOs
 {
-    public class PlayerGetDTO
+    public class PlayerUpdateDTO
     {
         public int Id { get; set; }
         public string? NickName { get; set; }
-        public int? Wins { get; set; }
-        public int? Losses { get; set; }
-        public int? GamesPlayed { get; set; }
+        public string? Email { get; set; }
+        public int? TeamId { get; set; }
         public List<int>? FriendIds { get; set; }
 
     }

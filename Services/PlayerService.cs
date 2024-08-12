@@ -6,12 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace HandFootLib.Services
 {
     public class PlayerService : IPlayerService
     {
-        private readonly Data _data = new();
+        private readonly Data _data;
 
         public PlayerService(Data data) { _data = data; }
 
@@ -32,50 +33,53 @@ namespace HandFootLib.Services
             _data.SaveChanges();
         }
 
-        public IQueryable<PlayerGetDTO> GetPlayer(int id)
+        public PlayerGetBasicDTO? GetPlayer(int id)
         {
             var allPlayers = GetPlayers();
 
-            var player = allPlayers.Where(p => p.Id == id);
+            var player = allPlayers.SingleOrDefault(p => p.Id == id);
 
             return player;
         }
 
-        public IQueryable<PlayerGetDTO> GetPlayers()
+        private IQueryable<PlayerGetBasicDTO> GetFriends(Player player)
+        {
+            var friendIds = player.FriendIds;
+
+            if (friendIds == null) {  return new List<PlayerGetBasicDTO>().AsQueryable(); }
+
+            var friends = _data.Players.Where(p => friendIds.Contains(p.Id))
+                                      .Select(p => new PlayerGetBasicDTO
+                                      {
+                                          Id = p.Id,
+                                          NickName = p.NickName,
+                                          Team = p.Team
+                                      });
+
+            return friends;
+        }
+
+        public IQueryable<PlayerGetBasicDTO> GetPlayers()
         {
 
-            var allPlayers = from p in _data.Players
-                      select new PlayerGetDTO
+            // ReSharper disable once EntityFramework.NPlusOne.IncompleteDataQuery
+            var all = _data.Players.ToList();
+
+            var allPlayers = all.Select( p => new PlayerGetBasicDTO
                       {
                           Id = p.Id,
                           NickName = p.NickName,
-                          Wins = p.Wins,
-                          Losses = p.Losses,
-                          GamesPlayed = p.GamesPlayed,
-                          FriendIds = p.FriendIds //Should this be a list of PlayerGetDTO?
-                      };
+                          Team = p.Team,
+                          Friends = GetFriends(p).ToList()
 
-            return allPlayers;
+                      });
+
+            return allPlayers.AsQueryable();
         }
-
-        //public List<PlayerGetDTO> GetPlayersForTeam(int teamId)
-        //{
-        //    var team = _data.Teams.Where(t => t.Id == teamId).FirstOrDefault();
-
-        //    return team.Players.Select(player => new PlayerGetDTO()
-        //        {
-        //            Id = player.Id,
-        //            NickName = player.NickName,
-        //            Wins = player.Wins,
-        //            Losses = player.Losses,
-        //            GamesPlayed = player.GamesPlayed,
-        //            FriendIds = player.FriendIds
-        //        })
-        //        .ToList();
-        //}
 
         public void UpdatePlayer(Player player)
         {
+
             _data.Update(player);
             _data.SaveChanges();
         }

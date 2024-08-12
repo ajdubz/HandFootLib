@@ -15,13 +15,13 @@ namespace HandFootLib.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        [StringLength(50)] // Set the maximum length to 50 characters
+        [StringLength(50)]
         public string? NickName { get; set; }
 
-        [StringLength(500)] // Set the maximum length to 500 characters
+        [StringLength(500)]
         public string? Email { get; set; }
 
-        [StringLength(50)] // Set the maximum length to 500 characters
+        [StringLength(50)]
         public string? Password { get; set; }
         public int? Wins { get; set; } = 0;
         public int? Losses { get; set; } = 0;

@@ -12,3 +12,4 @@ M:\Dev\Projects\HandFootLib\obj\Debug\net8.0\refint\HandFootLib.dll
 M:\Dev\Projects\HandFootLib\obj\Debug\net8.0\HandFootLib.pdb
 M:\Dev\Projects\HandFootLib\obj\Debug\net8.0\HandFootLib.genruntimeconfig.cache
 M:\Dev\Projects\HandFootLib\obj\Debug\net8.0\ref\HandFootLib.dll
+M:\Dev\Projects\HandFootLib\obj\Debug\net8.0\HandFootLib.sourcelink.json
