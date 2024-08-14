@@ -8,7 +8,7 @@ namespace HandFootLib.Models.DTOs
 {
     public class GameDTO
     {
-        public List<Team> Teams { get; set; }
+        //public List<Team> Teams { get; set; }
 
     }
 }

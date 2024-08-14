@@ -1,52 +1,72 @@
 ﻿using HandFootLib.Models;
-using HandFootLib.Models.DTOs;
+using HandFootLib.Models.DTOs.Team;
 using HandFootLib.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using System.Numerics;
 
 namespace HandFootLib.Services
 {
     public class TeamService : ITeamService
     {
         private readonly Data _data;
-        private readonly IPlayerService _playerService;
+        //private readonly IPlayerService _playerService;
 
         public TeamService(Data data, IPlayerService playerService)
         {
             _data = data;
-            _playerService = playerService;
+            //_playerService = playerService;
         }
 
         public void AddPlayerToTeam(int playerId, int teamId)
         {
-            //var player = _playerService.GetPlayer(playerId);
 
-            //var team = _data.Teams.Where(t => t.Id == teamId).FirstOrDefault();
+            var player = _data.Players.SingleOrDefault(p => p.Id == playerId);
+            var team = _data.Teams.SingleOrDefault(p => p.Id == teamId);
 
-            //team.Players.Add(player);
-            //_data.Update(team);
-            //_data.SaveChanges();
+            if (player == null || team == null) return;
+
+            player.Team = team;
+            team.Players.Add(player);
+
+            _data.Players.Update(player);
+            _data.Update(team);
+            _data.SaveChanges();
         }
 
-        public void AddTeam(Team team)
+        public void AddTeam(TeamCreateDTO teamCreateDTO)
         {
+            var team = new Team
+            {
+                Name = teamCreateDTO.Name,
+                Players = GetPlayers(teamCreateDTO.PlayerIds).ToList()
+            };
+
             _data.Add(team);
             _data.SaveChanges();
         }
 
-        public void DeleteTeam(int id)
+        public void RemoveTeam(int id)
         {
-            //var teams = _data.Teams.Where(t => t.Id == id);
+            var team = _data.Teams.Include(team => team.Players).SingleOrDefault(t => t.Id == id);
 
-            //var team = teams.FirstOrDefault();
+            if (team == null) return;
 
-            //foreach (var player in team.Players)
-            //{
-            //    team = RemovePlayerFromTeam(player.Id, team.Id);
-            //}
-            //_data.Teams.Remove(team);
-            //_data.SaveChanges();
+            var allPlayers = team.Players;
+
+            foreach (var player in allPlayers)
+            {
+
+                player.TeamId = null;
+                player.Team = null;
+                _data.Players.Update(player);
+
+            }
+
+            _data.Teams.Remove(team);
+            _data.SaveChanges();
         }
 
-        public TeamGetDTO GetTeam(int id)
+        public TeamGetBasicDTO? GetTeam(int id)
         {
             var allTeams = GetTeams();
 
@@ -55,29 +75,10 @@ namespace HandFootLib.Services
             return team;
         }
 
-        //private IQueryable<PlayerGetBasicDTO> GetPlayers (Team team)
-        //{
-        //    var playerIds = team.PlayerIds;
-
-        //    if (playerIds == null) { return new List<PlayerGetBasicDTO>().AsQueryable(); }
-
-        //    var players = _data.Players.Where(p => playerIds.Contains(p.Id))
-        //        .Select(p => new PlayerGetBasicDTO
-        //        {
-        //            Id = p.Id,
-        //            NickName = p.NickName
-        //        });
-
-        //    return players;
-
-        //}
-
-        public IQueryable<TeamGetDTO> GetTeams()
+        public IQueryable<TeamGetBasicDTO> GetTeams()
         {
             var allTeams = from t in _data.Teams
-                           join p in _data.Players
-                           on t.Id equals p.TeamId
-                           select new TeamGetDTO
+                           select new TeamGetBasicDTO
                            {
                                Id = t.Id,
                                Name = t.Name,
@@ -86,34 +87,46 @@ namespace HandFootLib.Services
             return allTeams;
         }
 
-        //public List<TeamGetDTO> GetTeamsForGame(int gameId)
-        //{
-        //    var game = _data.Games.Where(g => g.Id == gameId).FirstOrDefault();
-
-        //    return game.Teams.ToList();
-        //}
-
         public void RemovePlayerFromTeam(int playerId, int teamId)
-        { 
-            //var allTeams = GetTeams();
+        {
+            var player = _data.Players.SingleOrDefault(p => p.Id == playerId);
+            var team = _data.Teams.SingleOrDefault(p => p.Id == teamId);
 
-            //var team = GetTeam(teamId).FirstOrDefault();
+            if (player == null || team == null) return;
 
-            //var allPlayers = PlayerService.GetPlayer(playerId);
+            player.Team = null;
+            player.TeamId = null;
+            _data.Players.Update(player);
 
-            //var player = _data.Players.Where(p => p.Id == playerId).FirstOrDefault();
+            team.Players.Add(player);
+            _data.Update(team);
 
-            //team.Players.Remove(player);
-            //_data.Update(team);
-            //_data.SaveChanges();
-
+            _data.SaveChanges();
         }
 
-        public void UpdateTeam(Team team)
+        public void UpdateTeam(TeamUpdateDTO teamUpdateDTO)
         {
+            var team = _data.Teams.SingleOrDefault(t => t.Id == teamUpdateDTO.Id);
+
+            if (team == null) return;
+
+            team.Name = teamUpdateDTO.Name;
+            team.Players = GetPlayers(teamUpdateDTO.PlayerIds).ToList();
 
             _data.Update(team);
             _data.SaveChanges();
+        }
+
+        private IQueryable<Player> GetPlayers(List<int> playerIds)
+        {
+            if (playerIds?.Count < 1) { return new List<Player>().AsQueryable(); }
+
+            var allPlayers = from p in _data.Players
+                             where playerIds.Contains(p.Id)
+                             select p;
+
+            return allPlayers;
+
         }
     }
 }

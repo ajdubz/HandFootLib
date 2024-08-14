@@ -1,5 +1,5 @@
 ﻿using HandFootLib.Models;
-using HandFootLib.Models.DTOs;
+using HandFootLib.Models.DTOs.Player;
 using System;
 using System.Collections.Generic;
 using System.Linq;

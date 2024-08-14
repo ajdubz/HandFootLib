@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
+using HandFootLib.Models.DTOs.Player;
+using HandFootLib.Models.DTOs.Team;
 
 namespace HandFootLib.Services
 {
@@ -37,9 +39,13 @@ namespace HandFootLib.Services
 
         public void RemoveFriend(int playerId, int friendId)
         {
-            var playerFriend = _data.PlayerFriends.SingleOrDefault(pf => pf.PlayerId == playerId && pf.FriendId == friendId);
+            var playerFriend = _data.PlayerFriends.SingleOrDefault(pf => pf.PlayerId == playerId && pf.FriendId == friendId) ??
+                               _data.PlayerFriends.SingleOrDefault(pf => pf.PlayerId == friendId && pf.FriendId == playerId);
+
+            if (playerFriend == null) return;
 
             _data.PlayerFriends.Remove(playerFriend);
+
             _data.SaveChanges();
         }
 
@@ -47,6 +53,10 @@ namespace HandFootLib.Services
         {
 
             var player = _data.Players.SingleOrDefault(p => p.Id == id);
+
+            if (player == null) return;
+
+            _data.PlayerFriends.RemoveRange(_data.PlayerFriends.Where(pf => pf.PlayerId == id || pf.FriendId == id));
 
             _data.Players.Remove(player);
             _data.SaveChanges();
@@ -64,7 +74,7 @@ namespace HandFootLib.Services
         private IQueryable<PlayerGetBasicDTO> GetFriends(int pId)
         {
 
-            var tryAgain = from f in _data.PlayerFriends
+            var allFriends = from f in _data.PlayerFriends
                            join p in _data.Players
                            on f.FriendId equals p.Id
                            where f.PlayerId == pId
@@ -72,37 +82,10 @@ namespace HandFootLib.Services
                            {
                                Id = p.Id,
                                NickName = p.NickName,
-                               TeamDTO = new TeamGetDTO { Id = p.Team.Id, Name = p.Team.Name ?? "No Team Found friends" },
+                               TeamDTO = new TeamGetBasicDTO { Id = p.Team.Id, Name = p.Team.Name },
                            };
 
-            return tryAgain;
-
-            //var playersFriends = _data.PlayerFriends.Where(pf => pf.PlayerId == pId).ToList();
-
-            //var tempAllFriends = new List<PlayerGetBasicDTO>();
-
-            //foreach (var pf in playersFriends)
-            //{
-            //    var friend = GetPlayer(pf.FriendId);
-
-            //    if (friend != null) tempAllFriends.Add(friend);
-            //}
-
-            //return tempAllFriends.AsQueryable();
-
-
-
-            //var allFriends = from f in _data.PlayerFriends
-            //                 join p in _data.Players
-            //                 on f.FriendId equals p.Id
-            //                 where f.PlayerId == pId
-            //                 select new PlayerGetBasicDTO
-            //                 {
-            //                     Id = p.Id,
-            //                     NickName = p.NickName,
-            //                 };
-
-            //return allFriends;
+            return allFriends;
         }
 
         public IQueryable<PlayerGetWithFriendsDTO> GetPlayers()
@@ -118,7 +101,6 @@ namespace HandFootLib.Services
                                  Id = p2.p.Id,
                                  NickName = p2.p.NickName,
                                  Friends = GetFriends(p2.p.Id).ToList(),
-
                              };
 
             return allPlayers.AsQueryable();
@@ -150,25 +132,6 @@ namespace HandFootLib.Services
         public IQueryable<PlayerGetWithFriendsDTO> GetPlayersWithFriends()
         {
 
-            //var allPlayers = GetPlayers().ToList();
-
-
-
-
-
-            //var allPlayersWithFriends = from p in allPlayers
-            //                            select new PlayerGetWithFriendsDTO
-            //                            {
-            //                                Id = p.Id,
-            //                                NickName = p.NickName,
-            //                                Friends = GetFriends(p.Id).ToList(),
-            //                                TeamDTO = new TeamGetDTO { Id = p.Team.Id, Name = p.Team.Name ?? "No Team Found friends" }
-
-            //                            };
-
-            //return allPlayersWithFriends;
-
-
 
             var all = (from p in _data.Players
                        join pf in _data.PlayerFriends
@@ -178,14 +141,12 @@ namespace HandFootLib.Services
                        .ToList();
 
 
-
             var allPlayers = from p2 in all
                              select new PlayerGetWithFriendsDTO
                              {
                                  Id = p2.p.Id,
                                  NickName = p2.p.NickName,
                                  Friends = GetFriends(p2.p.Id).ToList(),
-
                              };
 
             return allPlayers.AsQueryable();

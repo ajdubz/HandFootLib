@@ -1,5 +1,5 @@
 ﻿using HandFootLib.Models;
-using HandFootLib.Models.DTOs;
+using HandFootLib.Models.DTOs.Team;
 
 namespace HandFootLib.Services.Interfaces
 {
@@ -7,18 +7,16 @@ namespace HandFootLib.Services.Interfaces
     {
         public void AddPlayerToTeam(int playerId, int teamId);
 
-        public void AddTeam(Team team);
+        public void AddTeam(TeamCreateDTO teamCreateDTO);
 
-        public void DeleteTeam(int id);
+        public void RemoveTeam(int id);
 
-        public TeamGetDTO GetTeam(int id);
+        public TeamGetBasicDTO? GetTeam(int id);
 
-        public IQueryable<TeamGetDTO> GetTeams();
-
-        //public List<TeamGetDTO> GetTeamsForGame(int gameId);
+        public IQueryable<TeamGetBasicDTO> GetTeams();
 
         public void RemovePlayerFromTeam(int playerId, int teamId);
 
-        public void UpdateTeam(Team team);
+        public void UpdateTeam(TeamUpdateDTO teamUpdateDTO);
     }
 }

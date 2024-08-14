@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HandFootLib.Models.DTOs.Team;
 
-namespace HandFootLib.Models.DTOs
+namespace HandFootLib.Models.DTOs.Player
 {
-    public class PlayerGetWithFriendsDTO
+    public class PlayerGetBasicDTO
     {
         public int Id { get; set; }
         public string? NickName { get; set; }
-        public TeamGetDTO? Team { get; set; }
+        public TeamGetBasicDTO? TeamDTO { get; set; }
+
         public List<PlayerGetBasicDTO>? Friends { get; set; }
 
     }
