@@ -7,17 +7,23 @@ namespace HandFootLib.Services
     public class TeamService : ITeamService
     {
         private readonly Data _data;
+        private readonly IPlayerService _playerService;
 
-        public TeamService(Data data) { _data = data; }
+        public TeamService(Data data, IPlayerService playerService)
+        {
+            _data = data;
+            _playerService = playerService;
+        }
 
         public void AddPlayerToTeam(int playerId, int teamId)
         {
-            var team = _data.Teams.Where(t => t.Id == teamId).FirstOrDefault();
-            var player = _data.Players.Where(p => p.Id == playerId).FirstOrDefault();
+            //var player = _playerService.GetPlayer(playerId);
 
-            team.Players.Add(player);
-            _data.Update(team);
-            _data.SaveChanges();
+            //var team = _data.Teams.Where(t => t.Id == teamId).FirstOrDefault();
+
+            //team.Players.Add(player);
+            //_data.Update(team);
+            //_data.SaveChanges();
         }
 
         public void AddTeam(Team team)
@@ -40,14 +46,31 @@ namespace HandFootLib.Services
             //_data.SaveChanges();
         }
 
-        public IQueryable<TeamGetDTO> GetTeam(int id)
+        public TeamGetDTO GetTeam(int id)
         {
             var allTeams = GetTeams();
 
-            var team = allTeams.Where(t => t.Id == id);
+            var team = allTeams.SingleOrDefault(t => t.Id == id);
 
             return team;
         }
+
+        //private IQueryable<PlayerGetBasicDTO> GetPlayers (Team team)
+        //{
+        //    var playerIds = team.PlayerIds;
+
+        //    if (playerIds == null) { return new List<PlayerGetBasicDTO>().AsQueryable(); }
+
+        //    var players = _data.Players.Where(p => playerIds.Contains(p.Id))
+        //        .Select(p => new PlayerGetBasicDTO
+        //        {
+        //            Id = p.Id,
+        //            NickName = p.NickName
+        //        });
+
+        //    return players;
+
+        //}
 
         public IQueryable<TeamGetDTO> GetTeams()
         {
@@ -58,8 +81,6 @@ namespace HandFootLib.Services
                            {
                                Id = t.Id,
                                Name = t.Name,
-                               PlayerId = p.Id,
-                               PlayerNickName = p.NickName
                            };
 
             return allTeams;

@@ -16,8 +16,9 @@ namespace HandFootLib.Models
 
         [StringLength(50)]
         public string? Name { get; set; }
-        public List<Player> Players { get; set; } = new List<Player>();
-        public List<GameTeam> Games { get; set; } = new List<GameTeam>();
+        public List<Player> Players { get; set; } = [];
+        //public List<int>? PlayerIds { get; set; }
+        public List<GameTeam> Games { get; set; } = [];
 
     }
 }

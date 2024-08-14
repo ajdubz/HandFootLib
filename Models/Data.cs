@@ -17,6 +17,7 @@ namespace HandFootLib.Models
         public DbSet<Game> Games { get; set; }
         public DbSet<Team> Teams { get; set; }
         public DbSet<Player> Players { get; set; }
+        public DbSet<PlayerFriend> PlayerFriends { get; set; }
         public DbSet<GameTeam> GameTeams { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

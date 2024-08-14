@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace HandFootLib.Models.DTOs
 {
-    public  class TeamCreateDTO
+    public class PlayerFriendBasicDTO
     {
-        public int Id { get; set; }
-        public string? Name { get; set; }
-        public List<int> PlayerIds { get; set; } = [];
+        public int PlayerId { get; set; }
+        public int FriendId { get; set; }
+
     }
 }

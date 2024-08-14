@@ -12,16 +12,20 @@ namespace HandFootLib.Services.Interfaces
     {
         public void AddPlayer(Player player);
 
-        public void DeletePlayer(int id);
+        public void RemovePlayer(int id);
 
-        public PlayerGetBasicDTO? GetPlayer(int id);
+        public PlayerGetWithFriendsDTO? GetPlayer(int id);
 
-        public IQueryable<PlayerGetBasicDTO> GetPlayers();
+        public IQueryable<PlayerGetWithFriendsDTO> GetPlayers();
 
-        //public void AddFriend(int playerId, int friendId);
+        public PlayerGetWithFriendsDTO GetPlayerWithFriends(int id);
 
-        //public void RemoveFriend(int playerId, int friendId);
+        public IQueryable<PlayerGetWithFriendsDTO> GetPlayersWithFriends();
 
-        public void UpdatePlayer(Player player);
+        public void AddFriend(int playerId, int friendId);
+
+        public void RemoveFriend(int playerId, int friendId);
+
+        public void UpdatePlayer(PlayerUpdateDTO playerUpdateDTO);
     }
 }
