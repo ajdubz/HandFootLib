@@ -3,18 +3,17 @@ using HandFootLib.Models.DTOs.Team;
 using HandFootLib.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Numerics;
+using HandFootLib.Models.DTOs.Player;
 
 namespace HandFootLib.Services
 {
     public class TeamService : ITeamService
     {
         private readonly Data _data;
-        //private readonly IPlayerService _playerService;
 
-        public TeamService(Data data, IPlayerService playerService)
+        public TeamService(Data data)
         {
             _data = data;
-            //_playerService = playerService;
         }
 
         public void AddPlayerToTeam(int playerId, int teamId)
@@ -26,10 +25,11 @@ namespace HandFootLib.Services
             if (player == null || team == null) return;
 
             player.Team = team;
+            player.TeamId = team.Id;
             team.Players.Add(player);
 
             _data.Players.Update(player);
-            _data.Update(team);
+            _data.Teams.Update(team);
             _data.SaveChanges();
         }
 
@@ -41,7 +41,11 @@ namespace HandFootLib.Services
                 Players = GetPlayers(teamCreateDTO.PlayerIds).ToList()
             };
 
-            _data.Add(team);
+
+
+
+
+            _data.Teams.Add(team);
             _data.SaveChanges();
         }
 
@@ -66,7 +70,7 @@ namespace HandFootLib.Services
             _data.SaveChanges();
         }
 
-        public TeamGetBasicDTO? GetTeam(int id)
+        public TeamGetWithPlayers? GetTeam(int id)
         {
             var allTeams = GetTeams();
 
@@ -75,13 +79,18 @@ namespace HandFootLib.Services
             return team;
         }
 
-        public IQueryable<TeamGetBasicDTO> GetTeams()
+        public IQueryable<TeamGetWithPlayers> GetTeams()
         {
             var allTeams = from t in _data.Teams
-                           select new TeamGetBasicDTO
+                           select new TeamGetWithPlayers
                            {
                                Id = t.Id,
                                Name = t.Name,
+                               Players = (from p in t.Players
+                                            select new PlayerGetBasicDTO
+                                            {
+                                                 NickName = p.NickName
+                                            }).ToList()
                            };
 
             return allTeams;
@@ -98,8 +107,8 @@ namespace HandFootLib.Services
             player.TeamId = null;
             _data.Players.Update(player);
 
-            team.Players.Add(player);
-            _data.Update(team);
+            team.Players.Remove(player);
+            _data.Teams.Update(team);
 
             _data.SaveChanges();
         }
@@ -113,7 +122,11 @@ namespace HandFootLib.Services
             team.Name = teamUpdateDTO.Name;
             team.Players = GetPlayers(teamUpdateDTO.PlayerIds).ToList();
 
-            _data.Update(team);
+
+
+
+
+            _data.Teams.Update(team);
             _data.SaveChanges();
         }
 

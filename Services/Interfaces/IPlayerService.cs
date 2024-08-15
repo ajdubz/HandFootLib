@@ -10,22 +10,22 @@ namespace HandFootLib.Services.Interfaces
 {
     public interface IPlayerService
     {
-        public void AddPlayer(Player player);
+        void AddPlayer(Player player);
 
-        public void RemovePlayer(int id);
+        void RemovePlayer(int id);
 
-        public PlayerGetWithFriendsDTO? GetPlayer(int id);
+        void UpdatePlayer(PlayerUpdateDTO playerUpdateDTO);
 
-        public IQueryable<PlayerGetWithFriendsDTO> GetPlayers();
+        void AddFriend(int playerId, int friendId);
 
-        public PlayerGetWithFriendsDTO GetPlayerWithFriends(int id);
+        void RemoveFriend(int playerId, int friendId);
 
-        public IQueryable<PlayerGetWithFriendsDTO> GetPlayersWithFriends();
+        PlayerGetWithFriendsDTO? GetPlayer(int id);
 
-        public void AddFriend(int playerId, int friendId);
+        IQueryable<PlayerGetWithFriendsDTO> GetPlayers();
 
-        public void RemoveFriend(int playerId, int friendId);
+        PlayerGetWithFriendsDTO GetPlayerWithFriends(int id);
 
-        public void UpdatePlayer(PlayerUpdateDTO playerUpdateDTO);
+        IQueryable<PlayerGetWithFriendsDTO> GetPlayersWithFriends();
     }
 }

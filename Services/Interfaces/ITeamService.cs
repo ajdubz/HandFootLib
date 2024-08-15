@@ -11,9 +11,9 @@ namespace HandFootLib.Services.Interfaces
 
         public void RemoveTeam(int id);
 
-        public TeamGetBasicDTO? GetTeam(int id);
+        public TeamGetWithPlayers? GetTeam(int id);
 
-        public IQueryable<TeamGetBasicDTO> GetTeams();
+        public IQueryable<TeamGetWithPlayers> GetTeams();
 
         public void RemovePlayerFromTeam(int playerId, int teamId);
 
