@@ -92,13 +92,16 @@ namespace HandFootLib.Services
         public IQueryable<PlayerGetWithFriendsDTO> GetPlayers()
         {
             var all = (from p in _data.Players select new { p }).ToList();
+            var allTeams = (from t in _data.Teams select new { t });
 
             var allPlayers = from p2 in all
+                             join t2 in _data.Teams on p2.p.TeamId equals t2.Id into teams
+                             from t2 in teams.DefaultIfEmpty()
                              select new PlayerGetWithFriendsDTO
                              {
                                  Id = p2.p.Id,
                                  NickName = p2.p.NickName,
-                                 Team = new TeamGetBasicDTO { Id = p2.p.TeamId ?? 0, Name = p2.p.Team?.Name ?? "No Team" },
+                                 Team = t2 != null ? new TeamGetBasicDTO { Id = t2.Id, Name = t2.Name } : new TeamGetBasicDTO { Id = 0, Name = "No Team" },
                                  Friends = GetFriends(p2.p.Id).ToList(),
                              };
 
@@ -110,13 +113,17 @@ namespace HandFootLib.Services
             var all = (from p in _data.Players
                        join pf in _data.PlayerFriends on p.Id equals pf.PlayerId
                        select new { p }).ToList();
+            var allTeams = (from t in _data.Teams select new { t });
 
             var allPlayers = from p2 in all
+                            join t2 in _data.Teams on p2.p.TeamId equals t2.Id into teams
+                            from t2 in teams.DefaultIfEmpty()
                              select new PlayerGetWithFriendsDTO
                              {
                                  Id = p2.p.Id,
                                  NickName = p2.p.NickName,
                                  Friends = GetFriends(p2.p.Id).ToList(),
+                                 Team = t2 != null ? new TeamGetBasicDTO { Id = t2.Id, Name = t2.Name } : new TeamGetBasicDTO { Id = 0, Name = "No Team" },
                              };
 
             return allPlayers.AsQueryable();
@@ -124,16 +131,35 @@ namespace HandFootLib.Services
 
         private IQueryable<PlayerGetBasicDTO> GetFriends(int pId)
         {
+            var allTeams = (from t in _data.Teams select new { t });
+
             var allFriends = from f in _data.PlayerFriends
                              join p in _data.Players on f.FriendId equals p.Id
+                             join t2 in _data.Teams on p.TeamId equals t2.Id into teams
+                             from t2 in teams.DefaultIfEmpty()
                              where f.PlayerId == pId
                              select new PlayerGetBasicDTO
                              {
+                                 Id = p.Id,
                                  NickName = p.NickName,
-                                 Team = new TeamGetBasicDTO { Id = p.TeamId ?? 0, Name = p.Team.Name ?? "No Team" },
+                                 Team = t2 != null ? new TeamGetBasicDTO { Id = t2.Id, Name = t2.Name } : new TeamGetBasicDTO { Id = 0, Name = "No Team" },
                              };
 
             return allFriends;
+        }
+
+        private List<TeamGetBasicDTO> GetTeam(int? Id)
+        {
+            var allTeams = from t in _data.Teams
+                           where t.Id == Id
+                           select new TeamGetBasicDTO
+                           {
+                               Id = t.Id,
+                               Name = t.Name,
+                           };
+
+            return allTeams.ToList();
+
         }
     }
 }

@@ -89,7 +89,8 @@ namespace HandFootLib.Services
                                Players = (from p in t.Players
                                             select new PlayerGetBasicDTO
                                             {
-                                                 NickName = p.NickName
+                                                Id = p.Id,
+                                                NickName = p.NickName
                                             }).ToList()
                            };
 
