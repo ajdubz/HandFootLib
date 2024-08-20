@@ -30,8 +30,6 @@ namespace HandFootLib.Models
 
         [ForeignKey("TeamId")]
         public Team? Team { get; set; }
-        //public List<int>? FriendIds { get; set; }
-        //public List<PlayerFriend> Friends { get; set; } = [];
 
     }
 }

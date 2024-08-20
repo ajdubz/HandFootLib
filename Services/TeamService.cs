@@ -16,131 +16,202 @@ namespace HandFootLib.Services
             _data = data;
         }
 
-        public void AddPlayerToTeam(int playerId, int teamId)
-        {
-
-            var player = _data.Players.SingleOrDefault(p => p.Id == playerId);
-            var team = _data.Teams.SingleOrDefault(p => p.Id == teamId);
-
-            if (player == null || team == null) return;
-
-            player.Team = team;
-            player.TeamId = team.Id;
-            team.Players.Add(player);
-
-            _data.Players.Update(player);
-            _data.Teams.Update(team);
-            _data.SaveChanges();
-        }
-
         public void AddTeam(TeamCreateDTO teamCreateDTO)
         {
-            var team = new Team
+            try
             {
-                Name = teamCreateDTO.Name,
-                Players = GetPlayers(teamCreateDTO.PlayerIds).ToList()
-            };
+                var team = new Team
+                {
+                    Name = teamCreateDTO.Name,
+                    Players = GetPlayers(teamCreateDTO.PlayerIds).ToList()
+                };
 
-
-
-
-
-            _data.Teams.Add(team);
-            _data.SaveChanges();
+                _data.Teams.Add(team);
+                _data.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                // Handle the exception here
+                Console.WriteLine($"An error occurred while adding team: {ex.Message}");
+            }
         }
-
+        
         public void RemoveTeam(int id)
         {
-            var team = _data.Teams.Include(team => team.Players).SingleOrDefault(t => t.Id == id);
-
-            if (team == null) return;
-
-            var allPlayers = team.Players;
-
-            foreach (var player in allPlayers)
+            try
             {
+                var team = _data.Teams.Include(team => team.Players).SingleOrDefault(t => t.Id == id);
 
-                player.TeamId = null;
-                player.Team = null;
-                _data.Players.Update(player);
+                if (team == null)
+                {
+                    Console.WriteLine("Team not found");
+                    return;
+                }
 
+                var allPlayers = team.Players;
+
+                foreach (var player in allPlayers)
+                {
+                    player.TeamId = null;
+                    player.Team = null;
+                    _data.Players.Update(player);
+                }
+
+                _data.Teams.Remove(team);
+                _data.SaveChanges();
             }
-
-            _data.Teams.Remove(team);
-            _data.SaveChanges();
+            catch (Exception ex)
+            {
+                // Handle the exception here
+                Console.WriteLine($"An error occurred while removing team: {ex.Message}");
+            }
         }
-
-        public TeamGetWithPlayers? GetTeam(int id)
+        
+        public void UpdateTeam(TeamUpdateDTO teamUpdateDTO)
         {
-            var allTeams = GetTeams();
+            try
+            {
+                var team = _data.Teams.SingleOrDefault(t => t.Id == teamUpdateDTO.Id);
 
-            var team = allTeams.SingleOrDefault(t => t.Id == id);
+                if (team == null)
+                {
+                    Console.WriteLine("Team not found");
+                    return;
+                }
 
-            return team;
+                team.Name = teamUpdateDTO.Name;
+                team.Players = GetPlayers(teamUpdateDTO.PlayerIds).ToList();
+
+                _data.Teams.Update(team);
+                _data.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                // Handle the exception here
+                Console.WriteLine($"An error occurred while updating team: {ex.Message}");
+            }
         }
-
-        public IQueryable<TeamGetWithPlayers> GetTeams()
+        
+        public void AddPlayerToTeam(int playerId, int teamId)
         {
-            var allTeams = from t in _data.Teams
-                           select new TeamGetWithPlayers
-                           {
-                               Id = t.Id,
-                               Name = t.Name,
-                               Players = (from p in t.Players
-                                            select new PlayerGetBasicDTO
-                                            {
-                                                Id = p.Id,
-                                                NickName = p.NickName
-                                            }).ToList()
-                           };
+            try
+            {
+                var player = _data.Players.SingleOrDefault(p => p.Id == playerId);
+                var team = _data.Teams.SingleOrDefault(p => p.Id == teamId);
 
-            return allTeams;
+                if (player == null || team == null)
+                {
+                    Console.WriteLine("Player or Team not found");
+                    return;
+                };
+
+                player.Team = team;
+                player.TeamId = team.Id;
+                team.Players.Add(player);
+
+                _data.Players.Update(player);
+                _data.Teams.Update(team);
+                _data.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                // Handle the exception here
+                Console.WriteLine($"An error occurred while adding player to team: {ex.Message}");
+            }
         }
 
         public void RemovePlayerFromTeam(int playerId, int teamId)
         {
-            var player = _data.Players.SingleOrDefault(p => p.Id == playerId);
-            var team = _data.Teams.SingleOrDefault(p => p.Id == teamId);
+            try
+            {
+                var player = _data.Players.SingleOrDefault(p => p.Id == playerId);
+                var team = _data.Teams.SingleOrDefault(p => p.Id == teamId);
 
-            if (player == null || team == null) return;
+                if (player == null || team == null)
+                {
+                    Console.WriteLine("Player or Team not found");
+                    return;
+                }
 
-            player.Team = null;
-            player.TeamId = null;
-            _data.Players.Update(player);
+                player.Team = null;
+                player.TeamId = null;
+                _data.Players.Update(player);
 
-            team.Players.Remove(player);
-            _data.Teams.Update(team);
+                team.Players.Remove(player);
+                _data.Teams.Update(team);
 
-            _data.SaveChanges();
+                _data.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                // Handle the exception here
+                Console.WriteLine($"An error occurred while removing player from team: {ex.Message}");
+            }
         }
 
-        public void UpdateTeam(TeamUpdateDTO teamUpdateDTO)
+
+        public TeamGetWithPlayers? GetTeam(int id)
         {
-            var team = _data.Teams.SingleOrDefault(t => t.Id == teamUpdateDTO.Id);
-
-            if (team == null) return;
-
-            team.Name = teamUpdateDTO.Name;
-            team.Players = GetPlayers(teamUpdateDTO.PlayerIds).ToList();
-
-
-
-
-
-            _data.Teams.Update(team);
-            _data.SaveChanges();
+            try
+            {
+                var allTeams = GetTeams();
+                var team = allTeams.SingleOrDefault(t => t.Id == id);
+                return team;
+            }
+            catch (Exception ex)
+            {
+                // Handle the exception here
+                Console.WriteLine($"An error occurred while getting team: {ex.Message}");
+                return null;
+            }
         }
+
+        public IQueryable<TeamGetWithPlayers> GetTeams()
+        {
+            try
+            {
+                var allTeams = from t in _data.Teams
+                               select new TeamGetWithPlayers
+                               {
+                                   Id = t.Id,
+                                   Name = t.Name,
+                                   Players = (from p in t.Players
+                                              select new PlayerGetBasicDTO
+                                              {
+                                                  Id = p.Id,
+                                                  NickName = p.NickName
+                                              }).ToList()
+                               };
+
+                return allTeams;
+            }
+            catch (Exception ex)
+            {
+                // Handle the exception here
+                Console.WriteLine($"An error occurred while getting teams: {ex.Message}");
+                return Enumerable.Empty<TeamGetWithPlayers>().AsQueryable();
+            }
+        }
+
 
         private IQueryable<Player> GetPlayers(List<int> playerIds)
         {
-            if (playerIds?.Count < 1) { return new List<Player>().AsQueryable(); }
+            try
+            {
+                if (playerIds?.Count < 1) { return new List<Player>().AsQueryable(); }
 
-            var allPlayers = from p in _data.Players
-                             where playerIds.Contains(p.Id)
-                             select p;
+                var allPlayers = from p in _data.Players
+                                 where playerIds.Contains(p.Id)
+                                 select p;
 
-            return allPlayers;
-
+                return allPlayers;
+            }
+            catch (Exception ex)
+            {
+                // Handle the exception here
+                Console.WriteLine($"An error occurred while getting players: {ex.Message}");
+                return Enumerable.Empty<Player>().AsQueryable();
+            }
         }
     }
 }

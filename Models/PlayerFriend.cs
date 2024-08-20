@@ -15,10 +15,5 @@ namespace HandFootLib.Models
         public int Id { get; set; }
         public int PlayerId { get; set; }
         public int FriendId { get; set; }
-
-        //[ForeignKey("PlayerId")]
-        //public Player Player { get; set; }
-        //[ForeignKey("FriendId")]
-        //public Player Friend { get; set; }
     }
 }
