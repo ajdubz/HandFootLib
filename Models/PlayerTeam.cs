@@ -8,23 +8,22 @@ using System.Threading.Tasks;
 
 namespace HandFootLib.Models
 {
-    public class Player
+    public class PlayerTeam
     {
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-
-        [StringLength(50)]
-        public string? NickName { get; set; }
-
-        [StringLength(500)]
-        public string? Email { get; set; }
-
-        [StringLength(50)]
-        public string? Password { get; set; }
+        public int? PlayerId { get; set; }
 
 
+        [ForeignKey("PlayerId")]
+        public Player? Player { get; set; }
+
+        public int? TeamId { get; set; }
+
+        [ForeignKey("TeamId")]
+        public Team? Team { get; set; }
 
     }
 }

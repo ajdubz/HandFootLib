@@ -16,7 +16,6 @@ namespace HandFootLib.Models
 
         [StringLength(50)]
         public string? Name { get; set; }
-        public List<Player>? Players { get; set; } = [];
 
     }
 }

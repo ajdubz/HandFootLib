@@ -23,7 +23,7 @@ namespace HandFootLib.Services
                 var team = new Team
                 {
                     Name = teamCreateDTO.Name,
-                    Players = GetPlayers(teamCreateDTO.PlayerIds).ToList()
+                    //Players = GetPlayers(teamCreateDTO.PlayerIds).ToList()
                 };
 
                 _data.Teams.Add(team);
@@ -40,7 +40,7 @@ namespace HandFootLib.Services
         {
             try
             {
-                var team = _data.Teams.Include(team => team.Players).SingleOrDefault(t => t.Id == id);
+                var team = _data.Teams.SingleOrDefault(t => t.Id == id);
 
                 if (team == null)
                 {
@@ -71,7 +71,7 @@ namespace HandFootLib.Services
                 }
 
                 team.Name = teamUpdateDTO.Name;
-                team.Players = GetPlayers(teamUpdateDTO.PlayerIds).ToList();
+                //team.Players = GetPlayers(teamUpdateDTO.PlayerIds).ToList();
 
                 _data.Teams.Update(team);
                 _data.SaveChanges();
@@ -96,7 +96,7 @@ namespace HandFootLib.Services
                     return;
                 };
 
-                team.Players.Add(player);
+                //team.Players.Add(player);
 
                 _data.Players.Update(player);
                 _data.Teams.Update(team);
@@ -122,7 +122,7 @@ namespace HandFootLib.Services
                     return;
                 }
 
-                team.Players.Remove(player);
+                //team.Players.Remove(player);
                 _data.Teams.Update(team);
 
                 _data.SaveChanges();
@@ -160,12 +160,6 @@ namespace HandFootLib.Services
                                {
                                    Id = t.Id,
                                    Name = t.Name,
-                                   Players = (from p in t.Players
-                                              select new PlayerGetBasicDTO
-                                              {
-                                                  Id = p.Id,
-                                                  NickName = p.NickName
-                                              }).ToList()
                                };
 
                 return allTeams;

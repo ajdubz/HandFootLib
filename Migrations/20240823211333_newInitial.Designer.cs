@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HandFootLib.Migrations
 {
     [DbContext(typeof(Data))]
-    [Migration("20240823031230_CoupleTweaks")]
-    partial class CoupleTweaks
+    [Migration("20240823211333_newInitial")]
+    partial class newInitial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

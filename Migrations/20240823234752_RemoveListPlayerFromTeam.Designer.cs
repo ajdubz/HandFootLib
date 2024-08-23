@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HandFootLib.Migrations
 {
     [DbContext(typeof(Data))]
-    [Migration("20240823025148_WholeLottaChangesWithKeith")]
-    partial class WholeLottaChangesWithKeith
+    [Migration("20240823234752_RemoveListPlayerFromTeam")]
+    partial class RemoveListPlayerFromTeam
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -43,6 +43,30 @@ namespace HandFootLib.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Games");
+                });
+
+            modelBuilder.Entity("HandFootLib.Models.GameRound", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("GameTeamId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RoundNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TotalScore")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GameTeamId");
+
+                    b.ToTable("GameRounds");
                 });
 
             modelBuilder.Entity("HandFootLib.Models.GameTeam", b =>
@@ -91,12 +115,7 @@ namespace HandFootLib.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int?>("TeamId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("TeamId");
 
                     b.ToTable("Players");
                 });
@@ -123,6 +142,29 @@ namespace HandFootLib.Migrations
                     b.ToTable("PlayerFriends");
                 });
 
+            modelBuilder.Entity("HandFootLib.Models.PlayerTeam", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("PlayerId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TeamId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlayerId");
+
+                    b.HasIndex("TeamId");
+
+                    b.ToTable("PlayerTeams");
+                });
+
             modelBuilder.Entity("HandFootLib.Models.Team", b =>
                 {
                     b.Property<int>("Id")
@@ -140,6 +182,15 @@ namespace HandFootLib.Migrations
                     b.ToTable("Teams");
                 });
 
+            modelBuilder.Entity("HandFootLib.Models.GameRound", b =>
+                {
+                    b.HasOne("HandFootLib.Models.GameTeam", "GameTeam")
+                        .WithMany()
+                        .HasForeignKey("GameTeamId");
+
+                    b.Navigation("GameTeam");
+                });
+
             modelBuilder.Entity("HandFootLib.Models.GameTeam", b =>
                 {
                     b.HasOne("HandFootLib.Models.Game", "Game")
@@ -155,16 +206,19 @@ namespace HandFootLib.Migrations
                     b.Navigation("Team");
                 });
 
-            modelBuilder.Entity("HandFootLib.Models.Player", b =>
+            modelBuilder.Entity("HandFootLib.Models.PlayerTeam", b =>
                 {
-                    b.HasOne("HandFootLib.Models.Team", null)
-                        .WithMany("Players")
-                        .HasForeignKey("TeamId");
-                });
+                    b.HasOne("HandFootLib.Models.Player", "Player")
+                        .WithMany()
+                        .HasForeignKey("PlayerId");
 
-            modelBuilder.Entity("HandFootLib.Models.Team", b =>
-                {
-                    b.Navigation("Players");
+                    b.HasOne("HandFootLib.Models.Team", "Team")
+                        .WithMany()
+                        .HasForeignKey("TeamId");
+
+                    b.Navigation("Player");
+
+                    b.Navigation("Team");
                 });
 #pragma warning restore 612, 618
         }

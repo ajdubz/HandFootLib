@@ -18,12 +18,13 @@ namespace HandFootLib.Models
         public DbSet<Team> Teams { get; set; }
         public DbSet<Player> Players { get; set; }
         public DbSet<PlayerFriend> PlayerFriends { get; set; }
+        public DbSet<PlayerTeam> PlayerTeams { get; set; }
         public DbSet<GameTeam> GameTeams { get; set; }
         public DbSet<GameRound> GameRounds { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            string constr = "database=HandFootScoring;server=adubzpc; Trusted_Connection=true;TrustServerCertificate=true;";
+            string constr = "database=HandAndFootData;server=adubzpc; Trusted_Connection=true;TrustServerCertificate=true;";
             optionsBuilder.UseSqlServer(constr, op =>
             {
 
