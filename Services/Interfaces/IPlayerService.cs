@@ -20,11 +20,10 @@ namespace HandFootLib.Services.Interfaces
 
         PlayerGetAccountDTO? GetPlayerAccount(int id);
 
-        IQueryable<PlayerGetFullDetailsDTO> GetPlayers();
+        IQueryable<PlayerGetAllDTO> GetPlayers();
         
-        IQueryable<PlayerGetAccountDTO> GetPlayersAccount();
-
         IQueryable<PlayerGetBasicDTO> GetPlayersBasic();
+
 
     }
 }
