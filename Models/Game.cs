@@ -9,7 +9,10 @@ namespace HandFootLib.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public List<GameTeam> Teams { get; set; } = new List<GameTeam>();
+
+        [StringLength(50)]
+        public string? Name { get; set; }
         public DateTime? Date { get; set; }
+
     }
 }

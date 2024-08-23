@@ -48,15 +48,6 @@ namespace HandFootLib.Services
                     return;
                 }
 
-                var allPlayers = team.Players;
-
-                foreach (var player in allPlayers)
-                {
-                    player.TeamId = null;
-                    player.Team = null;
-                    _data.Players.Update(player);
-                }
-
                 _data.Teams.Remove(team);
                 _data.SaveChanges();
             }
@@ -105,8 +96,6 @@ namespace HandFootLib.Services
                     return;
                 };
 
-                player.Team = team;
-                player.TeamId = team.Id;
                 team.Players.Add(player);
 
                 _data.Players.Update(player);
@@ -132,10 +121,6 @@ namespace HandFootLib.Services
                     Console.WriteLine("Player or Team not found");
                     return;
                 }
-
-                player.Team = null;
-                player.TeamId = null;
-                _data.Players.Update(player);
 
                 team.Players.Remove(player);
                 _data.Teams.Update(team);

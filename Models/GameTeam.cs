@@ -8,15 +8,16 @@ namespace HandFootLib.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public int GameId { get; set; }
+        public int? GameId { get; set; }
 
         [ForeignKey("GameId")]
-        public Game Game { get; set; }
+        public Game? Game { get; set; }
 
-        public int TeamId { get; set; }
+        public int? TeamId { get; set; }
 
         [ForeignKey("TeamId")]
-        public Team Team { get; set; }
-        public bool IsWinner { get; set; }
+        public Team? Team { get; set; }
+        public int? Rank { get; set; }
+
     }
 }

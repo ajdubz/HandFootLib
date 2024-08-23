@@ -23,13 +23,6 @@ namespace HandFootLib.Models
 
         [StringLength(50)]
         public string? Password { get; set; }
-        public int? Wins { get; set; } = 0;
-        public int? Losses { get; set; } = 0;
-        public int? GamesPlayed { get; set; } = 0;
-        public int? TeamId { get; set; }
-
-        [ForeignKey("TeamId")]
-        public Team? Team { get; set; }
 
     }
 }

@@ -13,18 +13,22 @@ using HandFootLib.Models.DTOs.Team;
 
 namespace HandFootLib.Services
 {
-    public class PlayerService : IPlayerService
+    public class PlayerService(Data data) : IPlayerService
     {
-        private readonly Data _data;
-
-        public PlayerService(Data data) { _data = data; }
-
-        public void AddPlayer(Player player)
+        public void AddPlayer(PlayerSetAccountDTO playerSetAccountDTO)
         {
             try
             {
-                _data.Players.Add(player);
-                _data.SaveChanges();
+                var newPlayer = new Player
+                {
+                    NickName = playerSetAccountDTO.NickName,
+                    Email = playerSetAccountDTO.Email,
+                    Password = playerSetAccountDTO.Password,
+
+                };
+
+                data.Players.Add(newPlayer);
+                data.SaveChanges();
             }
             catch (Exception ex)
             {
@@ -37,7 +41,7 @@ namespace HandFootLib.Services
         {
             try
             {
-                var player = _data.Players.SingleOrDefault(p => p.Id == id);
+                var player = data.Players.SingleOrDefault(p => p.Id == id);
 
                 if (player == null)
                 {
@@ -45,10 +49,10 @@ namespace HandFootLib.Services
                     return;
                 };
 
-                _data.PlayerFriends.RemoveRange(_data.PlayerFriends.Where(pf => pf.PlayerId == id || pf.FriendId == id));
+                data.PlayerFriends.RemoveRange(data.PlayerFriends.Where(pf => pf.PlayerId == id || pf.FriendId == id));
 
-                _data.Players.Remove(player);
-                _data.SaveChanges();
+                data.Players.Remove(player);
+                data.SaveChanges();
             }
             catch (Exception ex)
             {
@@ -57,24 +61,24 @@ namespace HandFootLib.Services
             }
         }
 
-
-        public void UpdatePlayer(PlayerUpdateDTO playerUpdateDTO)
+        public void UpdatePlayerAccount(int playerId, PlayerSetAccountDTO playerSetAccountDTO)
         {
             try
             {
-                var player = _data.Players.SingleOrDefault(p => p.Id == playerUpdateDTO.Id);
+                var player = data.Players.SingleOrDefault(p => p.Id == playerId);
 
                 if (player == null)
                 {
-                    Console.WriteLine($"An error occurred: player with id {playerUpdateDTO.Id} is null");
+                    Console.WriteLine($"An error occurred: player url with id {playerId} is null or invalid");
                     return;
                 }
 
-                player.NickName = playerUpdateDTO.NickName;
-                player.Email = playerUpdateDTO.Email;
+                player.NickName = playerSetAccountDTO.NickName;
+                player.Email = playerSetAccountDTO.Email;
+                player.Password = playerSetAccountDTO.Password;
 
-                _data.Update(player);
-                _data.SaveChanges();
+                data.Update(player);
+                data.SaveChanges();
             }
             catch (Exception ex)
             {
@@ -82,6 +86,7 @@ namespace HandFootLib.Services
                 throw; // Rethrow the exception to propagate it to the caller
             }
         }
+
 
 
 
@@ -95,8 +100,8 @@ namespace HandFootLib.Services
                     FriendId = friendId
                 };
 
-                _data.PlayerFriends.Add(playerFriend);
-                _data.SaveChanges();
+                data.PlayerFriends.Add(playerFriend);
+                data.SaveChanges();
             }
             catch (Exception ex)
             {
@@ -109,13 +114,8 @@ namespace HandFootLib.Services
         {
             try
             {
-                var playerFriend = _data.PlayerFriends.SingleOrDefault(pf => pf.PlayerId == playerId && pf.FriendId == friendId) ??
-                                   _data.PlayerFriends.SingleOrDefault(pf => pf.PlayerId == friendId && pf.FriendId == playerId);
-
-                if (playerFriend == null) return;
-
-                _data.PlayerFriends.Remove(playerFriend);
-                _data.SaveChanges();
+                data.PlayerFriends.RemoveRange(data.PlayerFriends.Where(pf => (pf.PlayerId == playerId && pf.FriendId == friendId) || (pf.FriendId == playerId && pf.PlayerId == friendId)));
+                data.SaveChanges();
             }
             catch (Exception ex)
             {
@@ -126,13 +126,31 @@ namespace HandFootLib.Services
 
 
 
-        public PlayerGetWithFriendsDTO? GetPlayer(int id)
+
+
+        public PlayerGetAccountDTO? GetPlayerAccount(int id)
+        {
+            try
+            {
+                var player = GetPlayersAccount().ToList().SingleOrDefault(p => p.Id == id);
+
+                return player;
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"An error occurred: {e.Message}");
+                throw;
+            }
+        }
+
+        public PlayerGetFullDetailsDTO? GetPlayer(int id)
         {
             try
             {
                 var allPlayers = GetPlayers();
 
-                var player = allPlayers.SingleOrDefault(p => p.Id == id);
+                var player = allPlayers.ToList().SingleOrDefault(p => p.Id == id);
 
                 return player;
             }
@@ -143,22 +161,17 @@ namespace HandFootLib.Services
             }
         }
 
-        public IQueryable<PlayerGetWithFriendsDTO> GetPlayers()
+        public IQueryable<PlayerGetFullDetailsDTO> GetPlayers()
         {
             try
             {
-                var all = (from p in _data.Players select new { p }).ToList();
-                var allTeams = (from t in _data.Teams select new { t });
+                var all = (from p in data.Players select new { p }).ToList();
 
                 var allPlayers = from p2 in all
-                                 join t2 in _data.Teams on p2.p.TeamId equals t2.Id into teams
-                                 from t2 in teams.DefaultIfEmpty()
-                                 select new PlayerGetWithFriendsDTO
+                                 select new PlayerGetFullDetailsDTO
                                  {
                                      Id = p2.p.Id,
                                      NickName = p2.p.NickName,
-                                     Email = p2.p.Email,
-                                     Team = t2 != null ? new TeamGetBasicDTO { Id = t2.Id, Name = t2.Name } : new TeamGetBasicDTO { Id = 0, Name = "No Team" },
                                      Friends = GetFriends(p2.p.Id).ToList(),
                                  };
 
@@ -171,24 +184,59 @@ namespace HandFootLib.Services
             }
         }
 
+        public IQueryable<PlayerGetBasicDTO> GetPlayersBasic()
+        {
+            try
+            {
+                var allPlayers = from p in data.Players
+                                 select new PlayerGetBasicDTO
+                                 {
+                                     Id = p.Id,
+                                     NickName = p.NickName,
+                                 };
 
+                return allPlayers;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                throw; // Rethrow the exception to propagate it to the caller
+            }
+        }
+
+        public IQueryable<PlayerGetAccountDTO> GetPlayersAccount()
+        {
+            try
+            {
+                var allPlayers = from p in data.Players
+                                 select new PlayerGetAccountDTO
+                                 {
+                                     Id = p.Id,
+                                     NickName = p.NickName,
+                                     Email = p.Email,
+                                     Password = p.Password,
+                                 };
+
+                return allPlayers;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                throw; // Rethrow the exception to propagate it to the caller
+            }
+        }
 
         private IQueryable<PlayerGetBasicDTO> GetFriends(int pId)
         {
             try
             {
-                var allTeams = (from t in _data.Teams select new { t });
-
-                var allFriends = from f in _data.PlayerFriends
-                                 join p in _data.Players on f.FriendId equals p.Id
-                                 join t2 in _data.Teams on p.TeamId equals t2.Id into teams
-                                 from t2 in teams.DefaultIfEmpty()
+                var allFriends = from f in data.PlayerFriends
+                                 join p in data.Players on f.FriendId equals p.Id
                                  where f.PlayerId == pId
                                  select new PlayerGetBasicDTO
                                  {
                                      Id = p.Id,
                                      NickName = p.NickName,
-                                     Team = t2 != null ? new TeamGetBasicDTO { Id = t2.Id, Name = t2.Name } : new TeamGetBasicDTO { Id = 0, Name = "No Team" },
                                  };
 
                 return allFriends;

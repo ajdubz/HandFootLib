@@ -7,12 +7,11 @@ using HandFootLib.Models.DTOs.Team;
 
 namespace HandFootLib.Models.DTOs.Player
 {
-    public class PlayerGetWithFriendsDTO
+    public class PlayerGetFullDetailsDTO
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
         public string? NickName { get; set; }
-        public string? Email { get; set; }
-        public TeamGetBasicDTO? Team { get; set; }
+        public List<GameTeam>? GameTeams { get; set; }
         public List<PlayerGetBasicDTO>? Friends { get; set; }
 
     }
