@@ -127,63 +127,6 @@ namespace HandFootLib.Services
 
 
 
-
-        public PlayerGetAccountDTO? GetPlayerAccount(int id)
-        {
-            try
-            {
-                var mainPlayers = GetPlayers();
-
-                var getPlayers = mainPlayers.Select(x => new PlayerGetAccountDTO
-                {
-                    Id = x.Id,
-                    NickName = x.NickName,
-                    Email = x.Email,
-                    Password = x.Password,
-
-                });
-
-
-                var player = getPlayers.ToList().SingleOrDefault(p => p.Id == id);
-
-                return player;
-
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"An error occurred: {e.Message}");
-                throw;
-            }
-        }
-
-        public PlayerGetFullDetailsDTO? GetPlayer(int id)
-        {
-            try
-            {
-                var getPlayers = GetPlayers();
-
-                var allPlayers = getPlayers.Select(p => new PlayerGetFullDetailsDTO
-                {
-                    Id = p.Id,
-                    NickName = p.NickName,
-                    Friends = p.Friends,
-
-                });
-
-                var player = allPlayers.ToList().SingleOrDefault(p => p.Id == id);
-
-                return player;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                throw; // Rethrow the exception to propagate it to the caller
-            }
-        }
-
-
-
-
         public IQueryable<PlayerGetAllDTO> GetPlayers()
         {
             try
@@ -206,28 +149,6 @@ namespace HandFootLib.Services
                 throw; // Rethrow the exception to propagate it to the caller
             }
         }
-
-        public IQueryable<PlayerGetBasicDTO> GetPlayersBasic()
-        {
-            try
-            {
-                var getPlayers = GetPlayers();
-                var allPlayers = getPlayers.Select(p => new PlayerGetBasicDTO
-                                 {
-                                     Id = p.Id,
-                                     NickName = p.NickName,
-                                 });
-
-                return allPlayers;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                throw; // Rethrow the exception to propagate it to the caller
-            }
-        }
-
-
 
 
         private IQueryable<PlayerGetBasicDTO> GetFriends(int? pId)

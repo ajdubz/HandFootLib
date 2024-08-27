@@ -11,18 +11,7 @@ namespace HandFootLib.Services.Interfaces
 
         void UpdatePlayerAccount(int playerId, PlayerSetAccountDTO playerSetAccountDTO);
 
-
-        void AddFriend(int playerId, int friendId);
-
-        void RemoveFriend(int playerId, int friendId);
-
-        PlayerGetFullDetailsDTO? GetPlayer(int id);
-
-        PlayerGetAccountDTO? GetPlayerAccount(int id);
-
         IQueryable<PlayerGetAllDTO> GetPlayers();
-        
-        IQueryable<PlayerGetBasicDTO> GetPlayersBasic();
 
 
     }
