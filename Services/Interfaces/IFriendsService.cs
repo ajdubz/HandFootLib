@@ -12,17 +12,15 @@ namespace HandFootLib.Services.Interfaces
     {
         void AddFriendRequest(int playerId, int friendId);
 
-        void RemoveFriendRequest(int playerId, int friendId);
-
         void AcceptFriendRequest(int playerId, int friendId);
 
         void DeclineFriendRequest(int playerId, int friendId);
 
-        IQueryable<PlayerGetBasicDTO> GetFriends(int playerId);
+        IQueryable<PlayerGetAllDTO> GetFriends(int playerId);
 
-        IQueryable<PlayerGetBasicDTO> GetFriendRequests(int playerId);
+        IQueryable<PlayerGetAllDTO> GetFriendRequests(int playerId);
 
-        IQueryable<PlayerGetBasicDTO> GetFriendRequestsSent(int playerId);
+        IQueryable<PlayerGetAllDTO> GetFriendRequestsSent(int playerId);
 
 
     }

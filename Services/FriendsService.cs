@@ -72,16 +72,35 @@ public class FriendsService : IFriendsService
 
     public void DeclineFriendRequest(int playerId, int friendId)
     {
-        throw new NotImplementedException();
+
+        if (playerId == 0)
+        {
+            throw new ArgumentException("PlayerId cannot be 0");
+        }
+        if (friendId == 0)
+        {
+            throw new ArgumentException("FriendId cannot be 0");
+        }
+
+        var existingRequest = _data.PlayerFriends.SingleOrDefault(pf => pf.PlayerId == playerId && pf.FriendId == friendId);
+
+        if (existingRequest == null)
+        {
+            throw new ArgumentException("Friend request does not exist");
+        }
+
+        _data.PlayerFriends.Remove(existingRequest);
+        _data.SaveChanges();
+
     }
 
-    public IQueryable<PlayerGetBasicDTO> GetFriendRequests(int playerId)
+    public IQueryable<PlayerGetAllDTO> GetFriendRequests(int playerId)
     {
 
         var friendSelect = from pf in _data.PlayerFriends
             join p in _data.Players on pf.PlayerId equals p.Id
             where pf.FriendId == playerId && pf.IsValidated == false
-            select new PlayerGetBasicDTO
+            select new PlayerGetAllDTO
             {
                 Id = pf.PlayerId,
                 NickName = p.NickName
@@ -90,12 +109,12 @@ public class FriendsService : IFriendsService
         return friendSelect;
     }
 
-    public IQueryable<PlayerGetBasicDTO> GetFriendRequestsSent(int playerId)
+    public IQueryable<PlayerGetAllDTO> GetFriendRequestsSent(int playerId)
     {
         var friendSelect = from pf in _data.PlayerFriends
             join p in _data.Players on pf.FriendId equals p.Id
             where pf.PlayerId == playerId && pf.IsValidated == false
-            select new PlayerGetBasicDTO
+            select new PlayerGetAllDTO
             {
                 Id = pf.FriendId,
                 NickName = p.NickName
@@ -104,13 +123,21 @@ public class FriendsService : IFriendsService
         return friendSelect;
     }
 
-    public IQueryable<PlayerGetBasicDTO> GetFriends(int playerId)
+    public IQueryable<PlayerGetAllDTO> GetFriends(int playerId)
     {
-        throw new NotImplementedException();
-    }
 
-    public void RemoveFriendRequest(int playerId, int friendId)
-    {
-        throw new NotImplementedException();
+        var friendSelect = from pf in _data.PlayerFriends
+                           join p in _data.Players on pf.FriendId equals p.Id
+                           where (pf.PlayerId == playerId) && pf.IsValidated == true
+                           select new PlayerGetAllDTO
+                           {
+                               Id = pf.FriendId,
+                               NickName = p.NickName
+                           };
+
+        return friendSelect;
+
+
+
     }
 }
