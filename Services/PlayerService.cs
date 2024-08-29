@@ -88,45 +88,6 @@ namespace HandFootLib.Services
         }
 
 
-
-
-        public void AddFriend(int playerId, int friendId)
-        {
-            try
-            {
-                var playerFriend = new PlayerFriend
-                {
-                    PlayerId = playerId,
-                    FriendId = friendId
-                };
-
-                data.PlayerFriends.Add(playerFriend);
-                data.SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                throw; // Rethrow the exception to propagate it to the caller
-            }
-        }
-
-        public void RemoveFriend(int playerId, int friendId)
-        {
-            try
-            {
-                data.PlayerFriends.RemoveRange(data.PlayerFriends.Where(pf => (pf.PlayerId == playerId && pf.FriendId == friendId) || (pf.FriendId == playerId && pf.PlayerId == friendId)));
-                data.SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                throw; // Rethrow the exception to propagate it to the caller
-            }
-        }
-
-
-
-
         public IQueryable<PlayerGetAllDTO> GetPlayers()
         {
             try
@@ -149,7 +110,6 @@ namespace HandFootLib.Services
                 throw; // Rethrow the exception to propagate it to the caller
             }
         }
-
 
         private IQueryable<PlayerGetBasicDTO> GetFriends(int? pId)
         {
