@@ -10,11 +10,13 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using HandFootLib.Models.DTOs.Player;
 using HandFootLib.Models.DTOs.Team;
+using Microsoft.Extensions.Logging;
 
 namespace HandFootLib.Services
 {
-    public class PlayerService(Data data) : IPlayerService
+    public class PlayerService(Data data, ILogger<PlayerService> _logger) : IPlayerService
     {
+
         public void AddPlayer(PlayerSetAccountDTO playerSetAccountDTO)
         {
             try
@@ -32,7 +34,7 @@ namespace HandFootLib.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
+                _logger.LogError(ex, "Error in AddPlayer");
                 throw; // Rethrow the exception to propagate it to the caller
             }
         }
@@ -56,7 +58,7 @@ namespace HandFootLib.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
+                _logger.LogError(ex, "Error in RemovePlayer");
                 throw; // Rethrow the exception to propagate it to the caller
             }
         }
@@ -82,7 +84,7 @@ namespace HandFootLib.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
+                _logger.LogError(ex, "Error in UpdatePlayerAccount");
                 throw; // Rethrow the exception to propagate it to the caller
             }
         }
@@ -106,7 +108,7 @@ namespace HandFootLib.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
+                _logger.LogError(ex, "Error in GetPlayers");
                 throw; // Rethrow the exception to propagate it to the caller
             }
         }
@@ -128,7 +130,7 @@ namespace HandFootLib.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
+                _logger.LogError(ex, "Error in GetFriends");
                 throw; // Rethrow the exception to propagate it to the caller
             }
         }
