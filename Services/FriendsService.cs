@@ -149,7 +149,8 @@ public class FriendsService : IFriendsService
                 select new PlayerGetAllDTO
                 {
                     Id = pf.PlayerId,
-                    NickName = p.NickName
+                    NickName = p.NickName,
+                    FullName = p.FullName,
                 };
 
             return friendSelect;
@@ -175,7 +176,8 @@ public class FriendsService : IFriendsService
                 select new PlayerGetAllDTO
                 {
                     Id = pf.FriendId,
-                    NickName = p.NickName
+                    NickName = p.NickName,
+                    FullName = p.FullName,
                 };
 
             return friendSelect;
@@ -203,7 +205,8 @@ public class FriendsService : IFriendsService
                 select new PlayerGetAllDTO
                 {
                     Id = pf.FriendId,
-                    NickName = p.NickName
+                    NickName = p.NickName,
+                    FullName = p.FullName,
                 };
 
             return friendSelect;

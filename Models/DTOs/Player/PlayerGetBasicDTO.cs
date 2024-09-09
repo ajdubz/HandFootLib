@@ -11,6 +11,7 @@ namespace HandFootLib.Models.DTOs.Player
     {
         public int? Id { get; set; }
         public string? NickName { get; set; }
+        public string? FullName { get; set; }
 
     }
 }

@@ -14,8 +14,16 @@ using Microsoft.Extensions.Logging;
 
 namespace HandFootLib.Services
 {
-    public class PlayerService(Data data, ILogger<PlayerService> _logger) : IPlayerService
+    public class PlayerService : IPlayerService
     {
+        private readonly Data _data;
+        private readonly ILogger<PlayerService> _logger;
+
+        public PlayerService(Data data, ILogger<PlayerService> logger)
+        {
+            _data = data;
+            _logger = logger;
+        }
 
         public void AddPlayer(PlayerSetAccountDTO playerSetAccountDTO)
         {
@@ -26,11 +34,11 @@ namespace HandFootLib.Services
                     NickName = playerSetAccountDTO.NickName,
                     Email = playerSetAccountDTO.Email,
                     Password = playerSetAccountDTO.Password,
-
+                    FullName = playerSetAccountDTO.FullName,
                 };
 
-                data.Players.Add(newPlayer);
-                data.SaveChanges();
+                _data.Players.Add(newPlayer);
+                _data.SaveChanges();
             }
             catch (Exception ex)
             {
@@ -43,7 +51,7 @@ namespace HandFootLib.Services
         {
             try
             {
-                var player = data.Players.SingleOrDefault(p => p.Id == id);
+                var player = _data.Players.SingleOrDefault(p => p.Id == id);
 
                 if (player == null)
                 {
@@ -51,10 +59,10 @@ namespace HandFootLib.Services
                     return;
                 };
 
-                data.PlayerFriends.RemoveRange(data.PlayerFriends.Where(pf => pf.PlayerId == id || pf.FriendId == id));
+                _data.PlayerFriends.RemoveRange(_data.PlayerFriends.Where(pf => pf.PlayerId == id || pf.FriendId == id));
 
-                data.Players.Remove(player);
-                data.SaveChanges();
+                _data.Players.Remove(player);
+                _data.SaveChanges();
             }
             catch (Exception ex)
             {
@@ -67,7 +75,7 @@ namespace HandFootLib.Services
         {
             try
             {
-                var player = data.Players.SingleOrDefault(p => p.Id == playerId);
+                var player = _data.Players.SingleOrDefault(p => p.Id == playerId);
 
                 if (player == null)
                 {
@@ -78,9 +86,10 @@ namespace HandFootLib.Services
                 player.NickName = playerSetAccountDTO.NickName;
                 player.Email = playerSetAccountDTO.Email;
                 player.Password = playerSetAccountDTO.Password;
+                player.FullName = playerSetAccountDTO.FullName;
 
-                data.Players.Update(player);
-                data.SaveChanges();
+                _data.Players.Update(player);
+                _data.SaveChanges();
             }
             catch (Exception ex)
             {
@@ -94,13 +103,14 @@ namespace HandFootLib.Services
         {
             try
             {
-                var allPlayers = from p in data.Players
+                var allPlayers = from p in _data.Players
                                  select new PlayerGetAllDTO
                                  {
                                      Id = p.Id,
                                      NickName = p.NickName,
                                      Email = p.Email,
                                      Password = p.Password,
+                                     FullName = p.FullName,
                                      Friends = GetFriends(p.Id).ToList(),
                                  };
 
@@ -117,13 +127,14 @@ namespace HandFootLib.Services
         {
             try
             {
-                var allFriends = from f in data.PlayerFriends
-                                 join p in data.Players on f.FriendId equals p.Id
+                var allFriends = from f in _data.PlayerFriends
+                                 join p in _data.Players on f.FriendId equals p.Id
                                  where f.PlayerId == pId
                                  select new PlayerGetBasicDTO
                                  {
                                      Id = p.Id,
                                      NickName = p.NickName,
+                                     FullName = p.FullName,
                                  };
 
                 return allFriends;

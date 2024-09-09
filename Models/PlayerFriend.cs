@@ -16,5 +16,6 @@ namespace HandFootLib.Models
         public int PlayerId { get; set; }
         public int FriendId { get; set; }
         public bool? IsValidated { get; set; }
+        public bool? IsBlocked { get; set; }
     }
 }

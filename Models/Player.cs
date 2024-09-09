@@ -24,6 +24,9 @@ namespace HandFootLib.Models
         [StringLength(50)]
         public string? Password { get; set; }
 
+        [StringLength(500)]
+        public string? FullName { get; set; }
+
 
 
     }
