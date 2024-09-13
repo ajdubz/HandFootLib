@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using HandFootLib.Models;
 using HandFootLib.Models.DTOs;
 using HandFootLib.Services.Interfaces;
 using Microsoft.IdentityModel.Tokens;
@@ -19,9 +20,9 @@ public class UserService : IUserService
 
         try
         {
-            var isValid = ValidatePlayer(loginGetDTO);
+            var foundPlayer = ValidatePlayer(loginGetDTO);
 
-            if (!isValid)
+            if (foundPlayer?.Id == 0)
             {
                 Console.WriteLine("Invalid player credentials");
                 throw new UnauthorizedAccessException("Invalid player credentials");
@@ -49,7 +50,7 @@ public class UserService : IUserService
 
             var writeToken = tokenHandler.WriteToken(token);
 
-            return new LoginReturnDTO { NickName = loginGetDTO.NickName, Email = loginGetDTO.Email, Token = writeToken, };
+            return new LoginReturnDTO { Id = foundPlayer?.Id,  NickName = loginGetDTO.NickName, Email = loginGetDTO.Email, Token = writeToken, };
         }
         catch (Exception ex)
         {
@@ -60,14 +61,14 @@ public class UserService : IUserService
 
     }
 
-    private bool ValidatePlayer(LoginGetDTO loginGetDTO)
+    private LoginReturnDTO? ValidatePlayer(LoginGetDTO loginGetDTO)
     {
         try
         {
-            var player = _playerService.GetPlayers().Select(x => new { x.NickName, x.Email, x.Password })
+            var player = _playerService.GetPlayers().Select(x => new LoginReturnDTO { Id = x.Id, NickName = x.NickName, Email = x.Email, Password = x.Password })
                 .SingleOrDefault(p => (p.NickName == loginGetDTO.NickName || p.Email == loginGetDTO.Email) && p.Password == loginGetDTO.Password);
 
-            return player != null;
+            return player;
         }
         catch (Exception ex)
         {
