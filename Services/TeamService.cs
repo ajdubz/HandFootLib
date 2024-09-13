@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Numerics;
 using HandFootLib.Models.DTOs.Player;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace HandFootLib.Services
 {
@@ -19,7 +20,7 @@ namespace HandFootLib.Services
             _logger = logger;
         }
 
-        public void AddTeam(TeamCreateDTO teamCreateDTO)
+        public TeamCreateDTO AddTeam(TeamCreateDTO teamCreateDTO)
         {
             try
             {
@@ -30,34 +31,99 @@ namespace HandFootLib.Services
 
                 _data.Teams.Add(team);
                 _data.SaveChanges();
+
+                if (team.Id == 0)
+                {
+                    _logger.LogError($"Error in AddTeam, missing teamID:  {team.Id}");
+                    throw new Exception("Missing teamID");
+
+                }
+
+                var newTeam = new TeamCreateDTO
+                {
+                    Id = team.Id,
+                    Name = team.Name
+                };
+
+                //_logger.LogWarning(team.Id.ToString() + " - " + newTeam.Id.ToString());
+
+                return newTeam;
             }
             catch (Exception ex)
             {
                 // Handle the exception here
                 _logger.LogError(ex, "Error in AddTeam");
+                throw; // Rethrow the exception to propagate it to the caller
             }
         }
 
-        public void AddPlayerToTeam(int playerId, int teamId)
+        public AddPlayersToTeamDTO AddPlayersToTeam(AddPlayersToTeamDTO addPlayersToTeam)
         {
             try
             {
-                var player = _data.Players.SingleOrDefault(p => p.Id == playerId);
-                var team = _data.Teams.SingleOrDefault(p => p.Id == teamId);
 
-                if (player == null || team == null)
+                if (addPlayersToTeam.PlayerId1 == 0)
                 {
-                    _logger.LogError("Error in AddPlayerToTeam, team or player not found");
-                    return;
+                    _logger.LogError($"Error in AddPlayersToTeam, missing player1ID.. teamName: {addPlayersToTeam.TeamName}");
+                    throw new Exception("Missing player1ID");
+                }
+
+                if (string.IsNullOrEmpty(addPlayersToTeam.TeamName))
+                {
+                    _logger.LogError($"Error in AddPlayersToTeam, missing teamName.. playerId1:  {addPlayersToTeam.PlayerId1}");
+                    throw new Exception("Missing teamName");
+                }
+
+                var newTeam = new Team
+                {
+                    Name = addPlayersToTeam.TeamName,
                 };
 
-                _data.Players.Update(player);
-                _data.Teams.Update(team);
+                _data.Teams.Add(newTeam);
                 _data.SaveChanges();
+
+                if (newTeam.Id == 0)
+                {
+                    _logger.LogError($"Error in AddPlayersToTeam, missing teamID.. teamName:  {addPlayersToTeam.TeamName}");
+                    throw new Exception("Missing teamID");
+                }
+
+
+                var newPlayerTeam1 = new PlayerTeam
+                {
+                    PlayerId = addPlayersToTeam.PlayerId1,
+                    TeamId = newTeam.Id,
+
+                };
+
+                _data.PlayerTeams.Add(newPlayerTeam1);
+
+
+                if (addPlayersToTeam.PlayerId2 > 0)
+                {
+                    var newPlayerTeam2 = new PlayerTeam
+                    {
+                        PlayerId = addPlayersToTeam.PlayerId2,
+                        TeamId = newTeam.Id,
+                    };
+
+                    _data.PlayerTeams.Add(newPlayerTeam2);
+                }
+
+                _data.SaveChanges();
+
+                return new AddPlayersToTeamDTO
+                {
+                    PlayerId1 = addPlayersToTeam.PlayerId1,
+                    PlayerId2 = addPlayersToTeam.PlayerId2,
+                    TeamId = newTeam.Id,
+                    TeamName = newTeam.Name,
+                };
+
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in AddPlayerToTeam");
+                _logger.LogError(ex, $"Error in AddPlayerToTeam {addPlayersToTeam.TeamId}");
                 throw; // Rethrow the exception to propagate it to the caller
             }
         }
@@ -76,81 +142,102 @@ namespace HandFootLib.Services
                 throw; // Rethrow the exception to propagate it to the caller
 
             }
+        }
+
+        public IQueryable<TeamGetWithPlayerNamesDTO> GetTeamsWithPlayerNames()
+        {
+            try
+            {
+                var playerTeams = from playerTeam in _data.PlayerTeams
+                    join player in _data.Players on playerTeam.PlayerId equals player.Id
+                    group player.NickName by playerTeam.TeamId into groupedPlayers
+                    select new TeamGetWithPlayerNamesDTO { Id = groupedPlayers.Key, PlayerNickNames = groupedPlayers.ToList() };
+
+                _logger.LogInformation(playerTeams.Any() ? "good playerTeams" : "bad playerTeams");
+
+
+                var teamNames = from team in _data.Teams
+                                select new TeamGetWithPlayerNamesDTO { Id = team.Id, Name = team.Name };
+
+                _logger.LogInformation(teamNames.Any() ? "good teamNames" : "bad teamNames");
+
+
+                //var teamsNames = from playerTeam in playerTeams
+                //                 join team in teamNames on playerTeam.Id equals team.Id
+                //                 select new TeamGetWithPlayerNamesDTO { Id = team.Id, Name = team.Name, PlayerNickNames = playerTeam.PlayerNickNames };
+
+
+                var teamsWithNames = from team in teamNames
+                                     join playerTeam in playerTeams on team.Id equals playerTeam.Id
+                                     select new TeamGetWithPlayerNamesDTO { Id = team.Id, Name = team.Name, PlayerNickNames = playerTeam.PlayerNickNames };
+
+                _logger.LogInformation(teamsWithNames.Any() ? "good teamsWithNames" : "bad teamsWithNames");
+
+
+                return teamsWithNames;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetTeams");
+                throw; // Rethrow the exception to propagate it to the caller
+
+            }
+        }
+
+        public IQueryable<TeamGetWithPlayerNamesDTO> GetPlayerTeams(int inId)
+        {
+            try
+            {
+                var allTeams = GetTeamsWithPlayerNames();
+
+                var teams = from team in allTeams
+                            join playerTeam in _data.PlayerTeams on team.Id equals playerTeam.TeamId
+                            where playerTeam.PlayerId == inId
+                            select new TeamGetWithPlayerNamesDTO { Id = team.Id, Name = team.Name, PlayerNickNames = team.PlayerNickNames };
+                return teams;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetTeams");
+                throw; // Rethrow the exception to propagate it to the caller
+
+            }
 
         }
 
-        //public void RemovePlayerFromTeam(int playerId, int teamId)
-        //{
-        //    try
-        //    {
-        //        var player = _data.Players.SingleOrDefault(p => p.Id == playerId);
-        //        var team = _data.Teams.SingleOrDefault(p => p.Id == teamId);
-
-        //        if (player == null || team == null)
-        //        {
-        //            Console.WriteLine("Player or Team not found");
-        //            return;
-        //        }
-
-        //        //team.Players.Remove(player);
-        //        _data.Teams.Update(team);
-
-        //        _data.SaveChanges();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Handle the exception here
-        //        Console.WriteLine($"An error occurred while removing player from team: {ex.Message}");
-        //    }
-        //}
+        public IQueryable<TeamGetWithPlayerNamesDTO> GetTeamByPlayerIds(GetTeamByPlayerIds getTeamByPlayerIds)
+        {
+            try
+            {
+                var allTeams = GetTeamsWithPlayerNames();
 
 
-        //public void RemoveTeam(int id)
-        //{
-        //    try
-        //    {
-        //        var team = _data.Teams.SingleOrDefault(t => t.Id == id);
+                var teams1 = from playerTeam in _data.PlayerTeams
+                            join team in allTeams on playerTeam.TeamId equals team.Id
+                            where playerTeam.PlayerId == getTeamByPlayerIds.PlayerId1
+                            select new TeamGetWithPlayerNamesDTO { Id = team.Id, Name = team.Name, PlayerNickNames = team.PlayerNickNames  };
 
-        //        if (team == null)
-        //        {
-        //            Console.WriteLine("Team not found");
-        //            return;
-        //        }
+                if (getTeamByPlayerIds.PlayerId2  == 0)
+                {
+                    return teams1;
+                }
 
-        //        _data.Teams.Remove(team);
-        //        _data.SaveChanges();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Handle the exception here
-        //        Console.WriteLine($"An error occurred while removing team: {ex.Message}");
-        //    }
-        //}
+                var teams2 = from playerTeam in _data.PlayerTeams
+                    join team in allTeams on playerTeam.TeamId equals team.Id
+                    where playerTeam.PlayerId == getTeamByPlayerIds.PlayerId2
+                    select new TeamGetWithPlayerNamesDTO { Id = team.Id, Name = team.Name, PlayerNickNames = team.PlayerNickNames };
 
-        //public void UpdateTeam(TeamUpdateDTO teamUpdateDTO)
-        //{
-        //    try
-        //    {
-        //        var team = _data.Teams.SingleOrDefault(t => t.Id == teamUpdateDTO.Id);
+                var sharedTeams = teams1.Intersect(teams2);
 
-        //        if (team == null)
-        //        {
-        //            Console.WriteLine("Team not found");
-        //            return;
-        //        }
 
-        //        team.Name = teamUpdateDTO.Name;
-        //        //team.Players = GetPlayers(teamUpdateDTO.PlayerIds).ToList();
-
-        //        _data.Teams.Update(team);
-        //        _data.SaveChanges();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Handle the exception here
-        //        Console.WriteLine($"An error occurred while updating team: {ex.Message}");
-        //    }
-        //}
+                return sharedTeams;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetTeamByPlayerIds");
+                throw; // Rethrow the exception to propagate it to the caller
+            }
+        }
 
     }
 }

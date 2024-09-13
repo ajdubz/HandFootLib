@@ -25,7 +25,7 @@ namespace HandFootLib.Services
             _logger = logger;
         }
 
-        public void AddPlayer(PlayerSetAccountDTO playerSetAccountDTO)
+        public PlayerSetAccountDTO AddPlayer(PlayerSetAccountDTO playerSetAccountDTO)
         {
             try
             {
@@ -39,6 +39,15 @@ namespace HandFootLib.Services
 
                 _data.Players.Add(newPlayer);
                 _data.SaveChanges();
+
+                return new PlayerSetAccountDTO
+                {
+                    Id = newPlayer.Id,
+                    NickName = newPlayer.NickName,
+                    Email = newPlayer.Email,
+                    Password = newPlayer.Password,
+                    FullName = newPlayer.FullName,
+                };
             }
             catch (Exception ex)
             {
@@ -79,7 +88,7 @@ namespace HandFootLib.Services
 
                 if (player == null)
                 {
-                    Console.WriteLine($"An error occurred: player url with id {playerId} is null or invalid");
+                    _logger.LogError("Error in UpdatePlayerAccount");
                     return;
                 }
 

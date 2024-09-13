@@ -6,15 +6,12 @@ namespace HandFootLib.Services.Interfaces
 {
     public interface ITeamService
     {
-        public void AddTeam(TeamCreateDTO teamCreateDTO);
-        public void AddPlayerToTeam(int playerId, int teamId);
+        public TeamCreateDTO AddTeam(TeamCreateDTO teamCreateDTO);
+        public AddPlayersToTeamDTO AddPlayersToTeam(AddPlayersToTeamDTO addPlayersToTeam);
         public IQueryable<TeamGetAllDTO> GetTeams();
-
-        //public void RemoveTeam(int id);
-
-        //public void UpdateTeam(TeamUpdateDTO teamUpdateDTO);
-
-        //public void RemovePlayerFromTeam(int playerId, int teamId);
+        public IQueryable<TeamGetWithPlayerNamesDTO> GetTeamsWithPlayerNames();
+        public IQueryable<TeamGetWithPlayerNamesDTO> GetTeamByPlayerIds(GetTeamByPlayerIds getTeamByPlayerIds);
+        public IQueryable<TeamGetWithPlayerNamesDTO> GetPlayerTeams(int inId);
 
     }
 }

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace HandFootLib.Models.DTOs.Team
 {
-    public class TeamCreateDTO
+    public class GetTeamByPlayerIds
     {
-        public int? Id { get; set; }
-        public string? Name { get; set; }
+        public int PlayerId1 { get; set; }
+        public int? PlayerId2 { get; set; }
     }
 }

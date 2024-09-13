@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("HandFootLib")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+407aa4506c8bd497dcf154c707b9e85a752c9045")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+addbc91121992f5d9cf20d2aacaccae146d34f9f")]
 [assembly: System.Reflection.AssemblyProductAttribute("HandFootLib")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HandFootLib")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

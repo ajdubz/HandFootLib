@@ -5,7 +5,7 @@ namespace HandFootLib.Services.Interfaces
 {
     public interface IPlayerService
     {
-        void AddPlayer(PlayerSetAccountDTO playerSetAccountDTO);
+        PlayerSetAccountDTO AddPlayer(PlayerSetAccountDTO playerSetAccountDTO);
 
         void RemovePlayer(int id);
 
