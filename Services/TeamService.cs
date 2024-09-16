@@ -153,25 +153,14 @@ namespace HandFootLib.Services
                     group player.NickName by playerTeam.TeamId into groupedPlayers
                     select new TeamGetWithPlayerNamesDTO { Id = groupedPlayers.Key, PlayerNickNames = groupedPlayers.ToList() };
 
-                _logger.LogInformation(playerTeams.Any() ? "good playerTeams" : "bad playerTeams");
-
 
                 var teamNames = from team in _data.Teams
                                 select new TeamGetWithPlayerNamesDTO { Id = team.Id, Name = team.Name };
-
-                _logger.LogInformation(teamNames.Any() ? "good teamNames" : "bad teamNames");
-
-
-                //var teamsNames = from playerTeam in playerTeams
-                //                 join team in teamNames on playerTeam.Id equals team.Id
-                //                 select new TeamGetWithPlayerNamesDTO { Id = team.Id, Name = team.Name, PlayerNickNames = playerTeam.PlayerNickNames };
 
 
                 var teamsWithNames = from team in teamNames
                                      join playerTeam in playerTeams on team.Id equals playerTeam.Id
                                      select new TeamGetWithPlayerNamesDTO { Id = team.Id, Name = team.Name, PlayerNickNames = playerTeam.PlayerNickNames };
-
-                _logger.LogInformation(teamsWithNames.Any() ? "good teamsWithNames" : "bad teamsWithNames");
 
 
                 return teamsWithNames;
