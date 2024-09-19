@@ -64,7 +64,7 @@ namespace HandFootLib.Services
 
                 if (player == null)
                 {
-                    Console.WriteLine($"An error occurred: player with id {id} is null");
+                    _logger.LogError("Error in RemovePlayer, player is null");
                     return;
                 };
 
@@ -132,7 +132,7 @@ namespace HandFootLib.Services
             }
         }
 
-        private IQueryable<PlayerGetBasicDTO> GetFriends(int? pId)
+        public IQueryable<PlayerGetBasicDTO> GetFriends(int? pId)
         {
             try
             {

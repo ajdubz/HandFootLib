@@ -150,8 +150,13 @@ namespace HandFootLib.Services
             {
                 var playerTeams = from playerTeam in _data.PlayerTeams
                     join player in _data.Players on playerTeam.PlayerId equals player.Id
-                    group player.NickName by playerTeam.TeamId into groupedPlayers
-                    select new TeamGetWithPlayerNamesDTO { Id = groupedPlayers.Key, PlayerNickNames = groupedPlayers.ToList() };
+                    group player by playerTeam.TeamId into groupedPlayers
+                    select new TeamGetWithPlayerNamesDTO { Id = groupedPlayers.Key, TeamMembers = groupedPlayers.Select(x => new PlayerGetBasicDTO
+                    {
+                        FullName = x.FullName,
+                        Id = x.Id,
+                        NickName = x.NickName
+                    }).ToList() };
 
 
                 var teamNames = from team in _data.Teams
@@ -160,7 +165,7 @@ namespace HandFootLib.Services
 
                 var teamsWithNames = from team in teamNames
                                      join playerTeam in playerTeams on team.Id equals playerTeam.Id
-                                     select new TeamGetWithPlayerNamesDTO { Id = team.Id, Name = team.Name, PlayerNickNames = playerTeam.PlayerNickNames };
+                                     select new TeamGetWithPlayerNamesDTO { Id = team.Id, Name = team.Name, TeamMembers = playerTeam.TeamMembers};
 
 
                 return teamsWithNames;
@@ -182,7 +187,7 @@ namespace HandFootLib.Services
                 var teams = from team in allTeams
                             join playerTeam in _data.PlayerTeams on team.Id equals playerTeam.TeamId
                             where playerTeam.PlayerId == inId
-                            select new TeamGetWithPlayerNamesDTO { Id = team.Id, Name = team.Name, PlayerNickNames = team.PlayerNickNames };
+                            select new TeamGetWithPlayerNamesDTO { Id = team.Id, Name = team.Name, TeamMembers = team.TeamMembers };
                 return teams;
             }
             catch (Exception ex)
@@ -204,7 +209,7 @@ namespace HandFootLib.Services
                 var teams1 = from playerTeam in _data.PlayerTeams
                             join team in allTeams on playerTeam.TeamId equals team.Id
                             where playerTeam.PlayerId == getTeamByPlayerIds.PlayerId1
-                            select new TeamGetWithPlayerNamesDTO { Id = team.Id, Name = team.Name, PlayerNickNames = team.PlayerNickNames  };
+                            select new TeamGetWithPlayerNamesDTO { Id = team.Id, Name = team.Name, TeamMembers = team.TeamMembers  };
 
                 if (getTeamByPlayerIds.PlayerId2  == 0)
                 {
@@ -214,7 +219,7 @@ namespace HandFootLib.Services
                 var teams2 = from playerTeam in _data.PlayerTeams
                     join team in allTeams on playerTeam.TeamId equals team.Id
                     where playerTeam.PlayerId == getTeamByPlayerIds.PlayerId2
-                    select new TeamGetWithPlayerNamesDTO { Id = team.Id, Name = team.Name, PlayerNickNames = team.PlayerNickNames };
+                    select new TeamGetWithPlayerNamesDTO { Id = team.Id, Name = team.Name, TeamMembers = team.TeamMembers };
 
                 var sharedTeams = teams1.Intersect(teams2);
 
@@ -225,6 +230,30 @@ namespace HandFootLib.Services
             {
                 _logger.LogError(ex, "Error in GetTeamByPlayerIds");
                 throw; // Rethrow the exception to propagate it to the caller
+            }
+        }
+
+        public IQueryable<PlayerGetBasicDTO> GetPlayersByTeamId (int teamId)
+        {
+            try
+            {
+
+                var team = from pt in _data.PlayerTeams
+                           join p in _data.Players on pt.PlayerId equals p.Id
+                           where pt.TeamId == teamId
+                           select new PlayerGetBasicDTO
+                           {
+                               Id = p.Id,
+                               NickName = p.NickName,
+                               FullName = p.FullName,
+                           };
+
+                return team;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetPlayersByTeamId");
+                throw;
             }
         }
 

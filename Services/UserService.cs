@@ -2,7 +2,7 @@
 using System.Security.Claims;
 using System.Text;
 using HandFootLib.Models;
-using HandFootLib.Models.DTOs;
+using HandFootLib.Models.DTOs.Login;
 using HandFootLib.Services.Interfaces;
 using Microsoft.IdentityModel.Tokens;
 

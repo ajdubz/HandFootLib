@@ -1,10 +1,14 @@
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using HandFootLib.Services;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace HandFootLib.Models
 {
-    public class Game
+    public class Rules
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

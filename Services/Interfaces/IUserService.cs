@@ -1,4 +1,4 @@
-﻿using HandFootLib.Models.DTOs;
+﻿using HandFootLib.Models.DTOs.Login;
 
 namespace HandFootLib.Services.Interfaces;
 

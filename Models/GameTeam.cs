@@ -17,7 +17,6 @@ namespace HandFootLib.Models
 
         [ForeignKey("TeamId")]
         public Team? Team { get; set; }
-        public int? Rank { get; set; }
 
     }
 }

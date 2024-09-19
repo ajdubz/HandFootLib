@@ -1,14 +1,14 @@
-using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-using HandFootLib.Services;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace HandFootLib.Models
+namespace HandFootLib.Models.DTOs.Rules
 {
-    public class Game
+    public class RulesSetDTO
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public int? Id { get; set; }
         public DateTime? Date { get; set; }
         public int? CleanBookScore { get; set; }
         public int? DirtyBookScore { get; set; }
@@ -18,6 +18,5 @@ namespace HandFootLib.Models
         public int? CardsToDraw { get; set; }
         public int? CardsToStart { get; set; }
         public int[]? RoundThresholds { get; set; }
-
     }
 }

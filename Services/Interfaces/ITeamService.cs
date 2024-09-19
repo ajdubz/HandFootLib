@@ -12,6 +12,8 @@ namespace HandFootLib.Services.Interfaces
         public IQueryable<TeamGetWithPlayerNamesDTO> GetTeamsWithPlayerNames();
         public IQueryable<TeamGetWithPlayerNamesDTO> GetTeamByPlayerIds(GetTeamByPlayerIds getTeamByPlayerIds);
         public IQueryable<TeamGetWithPlayerNamesDTO> GetPlayerTeams(int inId);
+        public IQueryable<PlayerGetBasicDTO> GetPlayersByTeamId(int teamId);
+
 
     }
 }

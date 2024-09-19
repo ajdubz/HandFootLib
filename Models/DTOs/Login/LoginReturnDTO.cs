@@ -1,4 +1,4 @@
-﻿namespace HandFootLib.Models.DTOs
+﻿namespace HandFootLib.Models.DTOs.Login
 {
     public class LoginReturnDTO
     {

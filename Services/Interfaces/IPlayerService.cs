@@ -13,6 +13,8 @@ namespace HandFootLib.Services.Interfaces
 
         IQueryable<PlayerGetAllDTO> GetPlayers();
 
+        IQueryable<PlayerGetBasicDTO> GetFriends(int? pId);
+
 
     }
 }

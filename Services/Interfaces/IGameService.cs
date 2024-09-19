@@ -1,4 +1,6 @@
 ﻿using HandFootLib.Models;
+using HandFootLib.Models.DTOs.Game;
+using HandFootLib.Models.DTOs.Player;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,14 +11,16 @@ namespace HandFootLib.Services.Interfaces
 {
     public interface IGameService
     {
-        public void AddGame(Game game);
+        public GameDTO AddGame(GameAddDTO gameAddDTO);
 
-        public void DeleteGame(int id);
+        public void RemoveGame(int id);
 
-        public Game GetGame(int id);
+        public IQueryable<GameDTO> GetGames();
 
-        public List<Game> GetGames();
+        public IQueryable<GameTeamDTO> GetTeamsByGameId(int gameId);
 
-        public void UpdateGame(Game game);
+        public IQueryable<GameRoundDTO> GetRoundsByGameId(int gameId);
+
+        public void AddTeamToGame(int gameId, int teamId);
     }
 }
