@@ -6,6 +6,7 @@ using System.Numerics;
 using HandFootLib.Models.DTOs.Player;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore.Internal;
+using HandFootLib.Models.DTOs.Game;
 
 namespace HandFootLib.Services
 {
@@ -153,9 +154,9 @@ namespace HandFootLib.Services
                     group player by playerTeam.TeamId into groupedPlayers
                     select new TeamGetWithPlayerNamesDTO { Id = groupedPlayers.Key, TeamMembers = groupedPlayers.Select(x => new PlayerGetBasicDTO
                     {
-                        FullName = x.FullName,
                         Id = x.Id,
-                        NickName = x.NickName
+                        NickName = x.NickName,
+                        FullName = x.FullName,
                     }).ToList() };
 
 
@@ -253,6 +254,33 @@ namespace HandFootLib.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in GetPlayersByTeamId");
+                throw;
+            }
+        }
+
+        public IQueryable<GameRoundDTO> GetRoundsByTeamId (int gameTeamId)
+        {
+            try
+            {
+                var gameRounds = from gr in _data.GameRounds
+                                 where gr.GameTeamId == gameTeamId
+                                 select new GameRoundDTO
+                                 {
+                                     Id = gr.Id,
+                                     RoundNumber = gr.RoundNumber,
+                                     HandScore = gr.HandScore,
+                                     CleanBooks = gr.CleanBooks,
+                                     DirtyBooks = gr.DirtyBooks,
+                                     RedThrees = gr.RedThrees,
+                                     PulledCorrect = gr.PulledCorrect,
+                                     IsWinner = gr.IsWinner,
+                                 };
+
+                return gameRounds;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
                 throw;
             }
         }

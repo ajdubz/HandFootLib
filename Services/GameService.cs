@@ -166,7 +166,7 @@ namespace HandFootLib.Services
                                          {
                                              Id = gt.Team != null ? gt.Team.Id : 0,
                                              Name = gt.Team != null ? gt.Team.Name : "",
-                                             //TeamMembers = _playerService.GetFriends(gt.Team != null ? gt.Team.Id : 0).ToList(),
+                                             TeamMembers = _teamService.GetPlayersByTeamId(gt.Team != null ? gt.Team.Id : 0).ToList(),
                                          },
                                      },
                                      RoundNumber = gr.RoundNumber,
